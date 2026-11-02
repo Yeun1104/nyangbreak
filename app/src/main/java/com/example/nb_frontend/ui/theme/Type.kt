@@ -16,20 +16,3 @@ val Roboto = FontFamily(
     Font(R.font.roboto_semibold, FontWeight.SemiBold),
     Font(R.font.roboto_bold, FontWeight.Bold)
 )
-
-val Typography = Typography(
-    // Jua
-    displayLarge = TextStyle(fontFamily = Jua, fontSize = 40.sp),
-    headlineLarge = TextStyle(fontFamily = Jua, fontSize = 28.sp),
-    titleLarge = TextStyle(fontFamily = Jua, fontSize = 20.sp),
-
-    // Roboto Bold
-    titleMedium = TextStyle(fontFamily = Roboto, fontWeight = FontWeight.Bold, fontSize = 16.sp),
-    bodyLarge = TextStyle(fontFamily = Roboto, fontWeight = FontWeight.Bold, fontSize = 16.sp),
-
-    // Roboto SemiBold
-    bodyMedium = TextStyle(fontFamily = Roboto, fontWeight = FontWeight.SemiBold, fontSize = 14.sp),
-    bodySmall = TextStyle(fontFamily = Roboto, fontWeight = FontWeight.SemiBold, fontSize = 12.sp),
-    labelLarge = TextStyle(fontFamily = Roboto, fontWeight = FontWeight.SemiBold, fontSize = 14.sp),
-    labelSmall = TextStyle(fontFamily = Roboto, fontWeight = FontWeight.SemiBold, fontSize = 11.sp),
-)
