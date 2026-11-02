@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -46,7 +47,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
@@ -62,6 +62,7 @@ import com.example.nb_frontend.ui.theme.NbBrown60
 import com.example.nb_frontend.ui.theme.NbBrown80
 import com.example.nb_frontend.ui.theme.NbBrown90
 import com.example.nb_frontend.ui.theme.NbOrange10
+import com.example.nb_frontend.ui.theme.NbOrange20
 import com.example.nb_frontend.ui.theme.NbOrange40
 import com.example.nb_frontend.ui.theme.NbOrange50
 import com.example.nb_frontend.ui.theme.NbOrange70
@@ -71,11 +72,11 @@ import kotlin.math.sin
 
 @Composable
 fun HomeScreen(
-    continuousMinutes: Int = 37,   // 연속 사용 시간
-    limitMinutes: Int = 60,        // 제한 시간
-    todayHours: Int = 4,           // 오늘 사용 시간(시)
-    todayMinutes: Int = 37,        // 오늘 사용 시간(분)
-    catCount: Int = 4              // 고양이 등장 횟수
+    continuousMinutes: Int = 20,
+    limitMinutes: Int = 60,
+    todayHours: Int = 4,
+    todayMinutes: Int = 20,
+    catCount: Int = 4
 ) {
     var isPaused by remember { mutableStateOf(false) }
     val remainMinutes = (limitMinutes - continuousMinutes).coerceAtLeast(0)
@@ -88,48 +89,45 @@ fun HomeScreen(
             .statusBarsPadding()
             .padding(horizontal = 24.dp)
     ) {
-        Spacer(modifier = Modifier.height(40.dp))
+        Spacer(modifier = Modifier.height(60.dp))
 
-        // 타이틀
         Text(
             text = "냥브레이크",
             fontFamily = Jua,
-            fontSize = 28.sp,
+            fontSize = 32.sp,
             color = NbBrown90
         )
-        Spacer(modifier = Modifier.height(6.dp))
+        Spacer(modifier = Modifier.height(8.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text = "오늘도 고양이가 지켜보고 있어요",
-                fontSize = 13.sp,
-                fontWeight = FontWeight.Bold,
-                color = NbBrown80
+                fontSize = 16.sp,
+                fontFamily = Jua,
+                color = NbBrown60
             )
             Spacer(modifier = Modifier.width(4.dp))
             Icon(
                 painter = painterResource(id = R.drawable.ic_paw),
                 contentDescription = null,
-                tint = NbOrange40,
+                tint = NbOrange20,
                 modifier = Modifier.size(16.dp)
             )
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(60.dp))
 
-        // 고양이 + 카드 영역
         Box(modifier = Modifier.fillMaxWidth()) {
-            // 고양이를 먼저 그려야 아래 카드가 고양이 턱을 덮음
             Image(
                 painter = painterResource(id = R.drawable.ic_cat),
                 contentDescription = null,
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .padding(top = 8.dp, end = 8.dp)
-                    .size(140.dp)
+                    .offset(x = 16.dp, y = (-44).dp)
+                    .size(200.dp)
             )
 
             Column {
-                Column(modifier = Modifier.width(150.dp)) {
+                Column(modifier = Modifier.width(164.dp)) {
                     RemainCard(remainMinutes = remainMinutes)
                     Spacer(modifier = Modifier.height(12.dp))
                     PauseButton(
@@ -154,7 +152,6 @@ fun HomeScreen(
     }
 }
 
-// 고양이 등장까지 카드
 @Composable
 private fun RemainCard(remainMinutes: Int) {
     Row(
@@ -163,26 +160,29 @@ private fun RemainCard(remainMinutes: Int) {
             .clip(RoundedCornerShape(12.dp))
             .background(NbOrange10)
             .padding(horizontal = 14.dp, vertical = 12.dp),
+        horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
             painter = painterResource(id = R.drawable.ic_timer),
             contentDescription = null,
             tint = NbBrown80,
-            modifier = Modifier.size(18.dp)
+            modifier = Modifier.size(20.dp)
         )
         Spacer(modifier = Modifier.width(8.dp))
         Column {
             Text(
                 text = "고양이 등장까지",
-                fontSize = 11.sp,
+                fontSize = 14.sp,
+                fontFamily = Jua,
                 color = NbBrown80
             )
+            Spacer(modifier = Modifier.height(2.dp))
             Text(
                 text = numberUnitText(
-                    "$remainMinutes" to "분",
-                    numberSize = 20.sp,
-                    unitSize = 12.sp,
+                    "$remainMinutes" to " 분",
+                    numberSize = 24.sp,
+                    unitSize = 14.sp,
                     numberColor = NbOrange70
                 )
             )
@@ -190,7 +190,6 @@ private fun RemainCard(remainMinutes: Int) {
     }
 }
 
-// 일시정지 버튼
 @Composable
 private fun PauseButton(isPaused: Boolean, onClick: () -> Unit) {
     OutlinedButton(
@@ -216,13 +215,12 @@ private fun PauseButton(isPaused: Boolean, onClick: () -> Unit) {
         Spacer(modifier = Modifier.width(6.dp))
         Text(
             text = if (isPaused) "다시 시작" else "일시정지",
-            fontSize = 13.sp,
-            fontWeight = FontWeight.Bold
+            fontSize = 14.sp,
+            fontFamily = Jua
         )
     }
 }
 
-// 흰색 메인 카드 (링 + 하단 통계)
 @Composable
 private fun UsageCard(
     continuousMinutes: Int,
@@ -234,14 +232,14 @@ private fun UsageCard(
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .height(400.dp)
             .clip(RoundedCornerShape(24.dp))
             .background(NbWhite)
-            .padding(top = 28.dp, bottom = 20.dp, start = 16.dp, end = 16.dp),
+            .padding(top = 40.dp, bottom = 20.dp, start = 16.dp, end = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         UsageRing(current = continuousMinutes, limit = limitMinutes)
-
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.weight(1f))
         HorizontalDivider(thickness = 1.dp, color = NbBrown10)
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -265,16 +263,14 @@ private fun UsageCard(
     }
 }
 
-// 원형 진행 링
 @Composable
 private fun UsageRing(current: Int, limit: Int) {
-    val ringSize = 200.dp
-    val strokeWidth = 24.dp
+    val ringSize = 240.dp
+    val strokeWidth = 32.dp
 
     val progress = (current.toFloat() / limit).coerceIn(0f, 1f)
     val sweep = 360f * progress
 
-    // 발바닥 배지 위치 (진행 끝 지점)
     val endAngle = Math.toRadians((-90f + sweep).toDouble())
     val radius = (ringSize - strokeWidth) / 2
     val badgeX = radius * cos(endAngle).toFloat()
@@ -289,7 +285,6 @@ private fun UsageRing(current: Int, limit: Int) {
             val arcSize = Size(size.width - stroke, size.height - stroke)
             val topLeft = Offset(stroke / 2, stroke / 2)
 
-            // 배경 링
             drawArc(
                 color = NbOrange10,
                 startAngle = 0f,
@@ -299,7 +294,6 @@ private fun UsageRing(current: Int, limit: Int) {
                 size = arcSize,
                 style = Stroke(width = stroke)
             )
-            // 진행 링
             drawArc(
                 color = NbOrange40,
                 startAngle = -90f,
@@ -311,9 +305,13 @@ private fun UsageRing(current: Int, limit: Int) {
             )
         }
 
-        // 가운데 텍스트
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(text = "연속사용", fontSize = 12.sp, color = NbBrown60)
+            Text(
+                text = "연속사용",
+                fontSize = 12.sp,
+                fontFamily = Jua,
+                color = NbBrown60
+            )
             Row {
                 Text(
                     text = "$current",
@@ -338,11 +336,10 @@ private fun UsageRing(current: Int, limit: Int) {
             )
         }
 
-        // 발바닥 배지
         Box(
             modifier = Modifier
                 .offset(x = badgeX, y = badgeY)
-                .size(36.dp)
+                .size(48.dp)
                 .clip(CircleShape)
                 .background(NbWhite)
                 .padding(3.dp)
@@ -354,13 +351,12 @@ private fun UsageRing(current: Int, limit: Int) {
                 painter = painterResource(id = R.drawable.ic_paw),
                 contentDescription = null,
                 tint = NbWhite,
-                modifier = Modifier.size(16.dp)
+                modifier = Modifier.size(24.dp)
             )
         }
     }
 }
 
-// 하단 통계 한 칸
 @Composable
 private fun StatItem(
     label: String,
@@ -371,13 +367,17 @@ private fun StatItem(
         modifier = modifier.padding(vertical = 4.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = label, fontSize = 12.sp, color = NbBrown60)
+        Text(
+            text = label,
+            fontSize = 12.sp,
+            fontFamily = Jua,
+            color = NbBrown60
+        )
         Spacer(modifier = Modifier.height(6.dp))
         Text(text = value)
     }
 }
 
-// "4시간 37분"처럼 숫자는 크게 주황, 단위는 작게 갈색
 private fun numberUnitText(
     vararg parts: Pair<String, String>,
     numberSize: TextUnit = 22.sp,
@@ -398,7 +398,7 @@ private fun numberUnitText(
 @Composable
 private fun HomePreview() {
     Scaffold(
-        bottomBar = {TabBar(currentRoute = "home", onTabClick = {}) }
+        bottomBar = { TabBar(currentRoute = "home", onTabClick = {}) }
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
             HomeScreen()
