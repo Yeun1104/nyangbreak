@@ -20,11 +20,19 @@ import androidx.compose.ui.unit.sp
 import com.example.nb_frontend.ui.theme.Jua
 import com.example.nb_frontend.ui.theme.NbBrown60
 import com.example.nb_frontend.ui.theme.NbBrown90
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.runtime.LaunchedEffect
+import kotlinx.coroutines.delay
 import androidx.compose.foundation.layout.width
 
+
 @Composable
-fun SplashScreen(){
+fun SplashScreen(onFinish: () -> Unit){
+
+    LaunchedEffect(Unit) {
+        delay(1500)
+        onFinish()
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -62,8 +70,8 @@ fun SplashScreen(){
     }
 }
 
-@Preview
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun SplashPreview(){
-    SplashScreen()
+    SplashScreen(onFinish = {})
 }
