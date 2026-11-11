@@ -21,6 +21,8 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -38,11 +40,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.nb_frontend.R
 import com.example.nb_frontend.ui.components.TabBar
-import androidx.compose.ui.unit.Dp
 import com.example.nb_frontend.ui.theme.Jua
 import com.example.nb_frontend.ui.theme.NbBrown10
 import com.example.nb_frontend.ui.theme.NbBrown20
@@ -64,7 +66,9 @@ private val catImages = listOf(
 )
 
 @Composable
-fun SettingsScreen() {
+fun SettingsScreen(
+    onTrackedAppsClick: () -> Unit = {}
+) {
     var usageLimit by remember { mutableIntStateOf(60) }
     var restTime by remember { mutableIntStateOf(3) }
     var emergencyEnabled by remember { mutableStateOf(true) }
@@ -110,6 +114,32 @@ fun SettingsScreen() {
                 selected = restTime,
                 onSelect = { restTime = it }
             )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        SettingCard(verticalPadding = 4.dp) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(onClick = onTrackedAppsClick)
+                    .padding(vertical = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "추적할 앱",
+                    fontFamily = Roboto,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 14.sp,
+                    color = NbBrown90,
+                    modifier = Modifier.weight(1f)
+                )
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = null,
+                    tint = NbBrown60
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
