@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- TODO: PoC 검증용 임시 화면. 화면 연결 후 삭제 예정 -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application>
+        <activity
+            android:name=".backend.debugtools.BackendTestActivity"
+            android:exported="true"
+            android:label="냥브레이크 PoC"
+            android:taskAffinity="com.example.nb_frontend.poc">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>
