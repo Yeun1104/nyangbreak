@@ -24,6 +24,7 @@ data class AppSettings(
     val catIndex: Int = 0,
     val paused: Boolean = false,
     val defaultLimitMinutes: Int = 60,
+    val preAlertEnabled: Boolean = true,
 ) {
     val cat: CatCharacter get() = CatCharacter.fromIndex(catIndex)
 }
@@ -40,6 +41,8 @@ class SettingsRepository private constructor(context: Context) {
     fun setDefaultLimitMinutes(minutes: Int) =
         update { it.copy(defaultLimitMinutes = minutes.coerceIn(MIN_LIMIT_MIN, MAX_LIMIT_MIN)) }
 
+    fun setPreAlertEnabled(enabled: Boolean) = update { it.copy(preAlertEnabled = enabled) }
+
     internal fun setPaused(paused: Boolean) = update { it.copy(paused = paused) }
 
     private fun update(change: (AppSettings) -> AppSettings) {
@@ -51,6 +54,7 @@ class SettingsRepository private constructor(context: Context) {
             putInt(K_CAT, next.catIndex)
             putBoolean(K_PAUSED, next.paused)
             putInt(K_DEFAULT_LIMIT, next.defaultLimitMinutes)
+            putBoolean(K_PRE_ALERT, next.preAlertEnabled)
         }
     }
 
@@ -62,6 +66,7 @@ class SettingsRepository private constructor(context: Context) {
             catIndex = prefs.getInt(K_CAT, d.catIndex),
             paused = prefs.getBoolean(K_PAUSED, d.paused),
             defaultLimitMinutes = prefs.getInt(K_DEFAULT_LIMIT, d.defaultLimitMinutes),
+            preAlertEnabled = prefs.getBoolean(K_PRE_ALERT, d.preAlertEnabled),
         )
     }
 
@@ -76,6 +81,9 @@ class SettingsRepository private constructor(context: Context) {
         private const val K_CAT = "cat_index"
         private const val K_PAUSED = "paused"
         private const val K_DEFAULT_LIMIT = "default_limit_minutes"
+        private const val K_PRE_ALERT = "pre_alert_enabled"
+
+        const val PRE_ALERT_BEFORE_MS = 5 * 60_000L
 
         @Volatile private var instance: SettingsRepository? = null
         fun get(context: Context): SettingsRepository =

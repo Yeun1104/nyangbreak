@@ -32,9 +32,13 @@ class NyangBreakApp : Application() {
             NotificationChannel(CHANNEL_MONITOR, "사용 시간 감시", NotificationManager.IMPORTANCE_LOW)
                 .apply { setShowBadge(false) }
         )
+        nm.createNotificationChannel(
+            NotificationChannel(CHANNEL_ALERT, "고양이 등장 미리 알림", NotificationManager.IMPORTANCE_DEFAULT)
+        )
     }
 
     companion object {
         const val CHANNEL_MONITOR = "monitor"
+        const val CHANNEL_ALERT = "pre_alert"
     }
 }

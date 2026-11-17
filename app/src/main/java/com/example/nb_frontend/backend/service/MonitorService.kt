@@ -41,6 +41,7 @@ class MonitorService : LifecycleService() {
 
     private var loopJob: Job? = null
     private var limits: Map<String, Long> = emptyMap()
+    private var labels: Map<String, String> = emptyMap()
     private var tickCount = 0
 
     override fun onCreate() {
@@ -106,7 +107,9 @@ class MonitorService : LifecycleService() {
         val s = settings.current
 
         if (tickCount % RELOAD_LIMITS_EVERY == 0) {
-            limits = repo.getEnabledAppLimits().associate { it.packageName to it.limitMinutes * 60_000L }
+            val enabled = repo.getEnabledAppLimits()
+            limits = enabled.associate { it.packageName to it.limitMinutes * 60_000L }
+            labels = enabled.associate { it.packageName to it.appLabel }
         }
 
         val foreground = detector.detect(now)
@@ -116,6 +119,7 @@ class MonitorService : LifecycleService() {
             limitsMillis = limits,
             breakMillis = s.breakSeconds * 1000L,
             paused = s.paused,
+            preAlertBeforeMillis = if (s.preAlertEnabled) SettingsRepository.PRE_ALERT_BEFORE_MS else null,
         )
         for (event in result.events) {
             Log.d(TAG, "상태 전이: $event")
@@ -159,6 +163,23 @@ class MonitorService : LifecycleService() {
                 event.breakEventId?.let { repo.finishBreak(it, event.at, event.reason.toDb()) }
                 repo.saveAccumulated(event.packageName, 0)
             }
+            is Event.PreAlert -> showPreAlert(event.packageName, event.remainingMillis)
+        }
+    }
+
+    private fun showPreAlert(pkg: String, remainingMillis: Long) {
+        if (!PermissionUtil.hasNotificationPermission(this)) return
+        val minutes = ((remainingMillis + 59_999) / 60_000).coerceAtLeast(1)
+        val n = NotificationCompat.Builder(this, NyangBreakApp.CHANNEL_ALERT)
+            .setSmallIcon(R.drawable.ic_paw)
+            .setContentTitle("곧 고양이가 와요")
+            .setContentText("${labels[pkg] ?: pkg}에서 ${minutes}분 뒤 쉬는 시간이에요")
+            .setAutoCancel(true)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .build()
+        try {
+            NotificationManagerCompat.from(this).notify(PRE_ALERT_ID_BASE + Math.floorMod(pkg.hashCode(), 1000), n)
+        } catch (_: SecurityException) {
         }
     }
 
@@ -241,6 +262,7 @@ class MonitorService : LifecycleService() {
     companion object {
         private const val TAG = "MonitorService"
         private const val NOTIFICATION_ID = 1001
+        private const val PRE_ALERT_ID_BASE = 2000
         private const val TICK_MS = 1_000L
         private const val SAVE_EVERY_TICKS = 10
         private const val RELOAD_LIMITS_EVERY = 3

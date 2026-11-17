@@ -14,4 +14,5 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
     fun setTapToDismissEnabled(enabled: Boolean) = repo.setTapToDismissEnabled(enabled)
     fun setCatIndex(index: Int) = repo.setCatIndex(index)
     fun setDefaultLimitMinutes(minutes: Int) = repo.setDefaultLimitMinutes(minutes)
+    fun setPreAlertEnabled(enabled: Boolean) = repo.setPreAlertEnabled(enabled)
 }
