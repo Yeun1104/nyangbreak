@@ -155,4 +155,47 @@ class GatekeeperEngineTest {
         assertTrue(restored.isOnBreak(yt))
         assertEquals(20_000L, restored.accumulatedOf(insta))
     }
+
+    private val longLimits = mapOf(yt to 10 * 60_000L)
+    private val before = 5 * 60_000L
+
+    private fun useWithAlert(pkg: String?, seconds: Int, alert: Long? = before) =
+        (1..seconds).map { now += 1000; e.tick(now, pkg, longLimits, breakMs, false, alert) }
+
+    @Test
+    fun 제한_5분_전에_미리_알림이_한_번만_온다() {
+        e.tick(now, yt, longLimits, breakMs, false, before)
+        val early = useWithAlert(yt, 299)
+        assertTrue(early.events().none { it is Event.PreAlert })
+        val r = useWithAlert(yt, 120)
+        val alerts = r.events().filterIsInstance<Event.PreAlert>()
+        assertEquals(1, alerts.size)
+        assertEquals(before, alerts.single().remainingMillis)
+    }
+
+    @Test
+    fun 해제되면_다음_회차에_다시_미리_알림이_온다() {
+        e.tick(now, yt, longLimits, breakMs, false, before)
+        useWithAlert(yt, 600)
+        assertTrue(e.isOnBreak(yt))
+        useWithAlert(yt, 30)
+        assertFalse(e.isOnBreak(yt))
+        val r = useWithAlert(yt, 400)
+        assertEquals(1, r.events().count { it is Event.PreAlert })
+    }
+
+    @Test
+    fun 미리_알림을_끄면_오지_않는다() {
+        e.tick(now, yt, longLimits, breakMs, false, null)
+        val r = useWithAlert(yt, 600, alert = null)
+        assertTrue(r.events().none { it is Event.PreAlert })
+    }
+
+    @Test
+    fun 제한이_5분_이하면_미리_알림이_없다() {
+        e.tick(now, yt, limits, breakMs, false, before)
+        val r = (1..60).map { now += 1000; e.tick(now, yt, limits, breakMs, false, before) }
+        assertTrue(r.events().none { it is Event.PreAlert })
+        assertTrue(e.isOnBreak(yt))
+    }
 }

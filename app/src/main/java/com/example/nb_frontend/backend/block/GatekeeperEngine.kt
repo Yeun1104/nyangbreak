@@ -11,6 +11,7 @@ class GatekeeperEngine(initialState: State = State()) {
         val accumulated: Map<String, Long> = emptyMap(),
         val breaks: Map<String, ActiveBreak> = emptyMap(),
         val session: OpenSession? = null,
+        val preAlerted: Set<String> = emptySet(),
         val lastTickAt: Long? = null,
     )
 
@@ -20,6 +21,7 @@ class GatekeeperEngine(initialState: State = State()) {
         data class SessionEnded(val packageName: String, val startedAt: Long, val endedAt: Long, val durationMillis: Long) : Event
         data class BreakStarted(val packageName: String, val at: Long, val until: Long) : Event
         data class BreakEnded(val packageName: String, val at: Long, val reason: EndReason, val breakEventId: Long?) : Event
+        data class PreAlert(val packageName: String, val remainingMillis: Long) : Event
     }
 
     data class TickResult(
@@ -48,6 +50,7 @@ class GatekeeperEngine(initialState: State = State()) {
         limitsMillis: Map<String, Long>,
         breakMillis: Long,
         paused: Boolean,
+        preAlertBeforeMillis: Long? = null,
     ): TickResult {
         val elapsed = state.lastTickAt?.let { (now - it).coerceIn(0, MAX_TICK_GAP_MS) } ?: 0L
         state = state.copy(lastTickAt = now)
@@ -76,7 +79,14 @@ class GatekeeperEngine(initialState: State = State()) {
                 accumulated = state.accumulated + (counted to acc),
                 session = state.session?.let { it.copy(durationMillis = it.durationMillis + elapsed) },
             )
-            if (acc >= limitsMillis.getValue(counted)) {
+            val limit = limitsMillis.getValue(counted)
+            if (preAlertBeforeMillis != null && limit > preAlertBeforeMillis &&
+                counted !in state.preAlerted && acc in (limit - preAlertBeforeMillis) until limit
+            ) {
+                state = state.copy(preAlerted = state.preAlerted + counted)
+                events += Event.PreAlert(counted, limit - acc)
+            }
+            if (acc >= limit) {
                 events += closeSession(now)
                 val until = now + breakMillis
                 state = state.copy(breaks = state.breaks + (counted to ActiveBreak(until)))
@@ -108,6 +118,7 @@ class GatekeeperEngine(initialState: State = State()) {
         state = state.copy(
             breaks = state.breaks - pkg,
             accumulated = state.accumulated + (pkg to 0L),
+            preAlerted = state.preAlerted - pkg,
         )
         return Event.BreakEnded(pkg, now, reason, b.breakEventId)
     }
