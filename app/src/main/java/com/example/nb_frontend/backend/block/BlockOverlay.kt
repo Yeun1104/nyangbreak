@@ -30,17 +30,18 @@ class BlockOverlay(context: Context) {
 
     val showingPackage: String? get() = shownFor
 
-    /** @return 오버레이 권한이 없으면 false */
+    /** @return 오버레이 권한이 없거나 휴식 화면이 등록되지 않았으면 false */
     fun show(packageName: String, cat: CatCharacter, canRelease: Boolean, release: () -> Unit): Boolean {
         if (shownFor == packageName) return true
         hide()
+        val screen = BreakScreenRegistry.content ?: return false
 
         val lifecycleOwner = OverlayLifecycleOwner().also { it.start() }
         val composeView = ComposeView(appContext).apply {
             setViewTreeLifecycleOwner(lifecycleOwner)
             setViewTreeSavedStateRegistryOwner(lifecycleOwner)
             setContent {
-                BreakScreenRegistry.content(BreakUiState(cat, remaining, canRelease), release)
+                screen(BreakUiState(cat, remaining, canRelease), release)
             }
         }
         val params = WindowManager.LayoutParams(

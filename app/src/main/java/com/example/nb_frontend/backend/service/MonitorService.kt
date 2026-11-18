@@ -131,7 +131,7 @@ class MonitorService : LifecycleService() {
             val wasShowing = overlay.showingPackage == pkg
             when {
                 !overlay.show(pkg, s.cat, s.tapToDismissEnabled) { onRelease(pkg) } ->
-                    Log.w(TAG, "다른 앱 위에 표시 권한이 없어 고양이를 띄우지 못함")
+                    Log.w(TAG, "고양이를 띄우지 못함 (오버레이 권한 또는 휴식 화면 미등록)")
                 !wasShowing -> Log.d(TAG, "고양이 표시: $pkg")
             }
             overlay.updateCountdown(result.breakRemainingMillis)
