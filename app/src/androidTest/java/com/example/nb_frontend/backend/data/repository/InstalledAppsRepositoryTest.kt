@@ -28,7 +28,15 @@ class InstalledAppsRepositoryTest {
         val all = runBlocking { repo.getLaunchableApps(includeSystemApps = true) }
         apps.forEach { Log.d(TAG, "${it.name} | ${it.packageName} | icon=${it.icon != null}") }
         Log.d(TAG, "기본 목록 ${apps.size}개 / 시스템 앱 포함 ${all.size}개")
+        Log.d(TAG, "유튜브($YOUTUBE) 기본 목록 포함: ${apps.any { it.packageName == YOUTUBE }}")
         assertTrue("가져온 앱이 하나도 없음", apps.isNotEmpty())
+    }
+
+    @Test
+    fun keepsYoutubeWhenInstalled() {
+        val apps = runBlocking { repo.getLaunchableApps() }.map { it.packageName }.toSet()
+        val all = runBlocking { repo.getLaunchableApps(includeSystemApps = true) }.map { it.packageName }.toSet()
+        if (YOUTUBE in all) assertTrue("유튜브가 설치돼 있는데 기본 목록에서 빠짐", YOUTUBE in apps)
     }
 
     @Test
@@ -70,5 +78,6 @@ class InstalledAppsRepositoryTest {
     companion object {
         private const val TAG = "InstalledAppsTest"
         private const val SETTINGS = "com.android.settings"
+        private const val YOUTUBE = "com.google.android.youtube"
     }
 }
