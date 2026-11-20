@@ -31,7 +31,8 @@ data class InstalledApp(
  * - 홈 화면에서 실행할 수 있는 앱(런처 아이콘이 있는 앱)만 가져온다
  * - 냥브레이크 자신은 뺀다
  * - 기본으로 깔려 있고 한 번도 업데이트되지 않은 시스템 앱(설정, 전화 등)은 뺀다.
- *   유튜브·크롬처럼 미리 깔려 있어도 스토어에서 업데이트된 앱은 남긴다
+ *   미리 깔려 있어도 스토어에서 업데이트된 앱은 남긴다
+ * - 유튜브·크롬처럼 감시 대상으로 자주 쓰는 앱(ALWAYS_SHOW)은 시스템 앱이어도 항상 남긴다
  * - 이름을 기기 언어 기준 가나다/ABC 순으로 정렬한다 (대소문자 구분 없음)
  *
  * AndroidManifest.xml의 <queries> 선언이 있어야 안드로이드 11 이상에서 전체 목록이 보인다.
@@ -49,7 +50,7 @@ class InstalledAppsRepository(private val context: Context) {
                 .map { it.activityInfo.applicationInfo }
                 .distinctBy { it.packageName }
                 .filter { it.packageName != context.packageName }
-                .filter { includeSystemApps || !isPreinstalledSystemApp(it) }
+                .filter { includeSystemApps || !isHiddenSystemApp(it) }
                 .map { info ->
                     InstalledApp(
                         packageName = info.packageName,
@@ -60,8 +61,9 @@ class InstalledAppsRepository(private val context: Context) {
                 .sortedWith(compareBy<InstalledApp, String>(collator) { it.name }.thenBy { it.packageName })
         }
 
-    /** 기본 탑재 시스템 앱이면서 업데이트된 적 없는 앱인지 */
-    private fun isPreinstalledSystemApp(info: ApplicationInfo): Boolean {
+    /** 목록에서 숨길 시스템 앱인지: 기본 탑재이면서 업데이트된 적 없고, ALWAYS_SHOW에도 없는 앱 */
+    private fun isHiddenSystemApp(info: ApplicationInfo): Boolean {
+        if (info.packageName in ALWAYS_SHOW) return false
         val isSystem = (info.flags and ApplicationInfo.FLAG_SYSTEM) != 0
         val isUpdated = (info.flags and ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0
         return isSystem && !isUpdated
@@ -79,5 +81,12 @@ class InstalledAppsRepository(private val context: Context) {
     companion object {
         /** 목록에 그릴 아이콘 크기 */
         private const val ICON_SIZE_DP = 48
+
+        /** 시스템 앱이어도 항상 목록에 보여줄 앱 (테스트·시연에 쓰는 유튜브 포함) */
+        val ALWAYS_SHOW = setOf(
+            "com.google.android.youtube",
+            "com.google.android.apps.youtube.music",
+            "com.android.chrome",
+        )
     }
 }
