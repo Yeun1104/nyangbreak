@@ -57,8 +57,8 @@ import com.example.nb_frontend.frontend.ui.theme.NbOrange40
 import com.example.nb_frontend.frontend.ui.theme.NbWhite
 import com.example.nb_frontend.frontend.ui.theme.Roboto
 
-private val usageOptions = listOf(15, 30, 45, 60, 75, 90)
-private val restOptions = listOf(1, 3, 5)
+private val usageOptions = listOf(1, 15, 30, 45, 60, 75, 90)
+private val restOptions = listOf(30, 60, 180)
 private val catImages = listOf(
     R.drawable.cat_tabby,
     R.drawable.cat_orange,
@@ -68,7 +68,7 @@ private val catImages = listOf(
 @Composable
 fun SettingsScreen(
     usageLimit: Int = 60,
-    restMinutes: Int = 3,
+    restSeconds: Int = 30,
     emergencyEnabled: Boolean = true,
     preAlertEnabled: Boolean = true,
     selectedCat: Int = 0,
@@ -140,8 +140,9 @@ fun SettingsScreen(
             Spacer(modifier = Modifier.height(16.dp))
             OptionChips(
                 options = restOptions,
-                selected = restMinutes,
-                onSelect = onRestChange
+                selected = restSeconds,
+                onSelect = onRestChange,
+                label = { seconds -> if (seconds < 60) "${seconds}초" else "${seconds / 60}분" }
             )
         }
 
@@ -241,7 +242,8 @@ private fun SectionTitle(text: String) {
 private fun OptionChips(
     options: List<Int>,
     selected: Int,
-    onSelect: (Int) -> Unit
+    onSelect: (Int) -> Unit,
+    label: (Int) -> String = { "${it}분" }
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         options.chunked(3).forEach { rowOptions ->
@@ -251,7 +253,7 @@ private fun OptionChips(
             ) {
                 rowOptions.forEach { minutes ->
                     OptionChip(
-                        text = "${minutes}분",
+                        text = label(minutes),
                         selected = selected == minutes,
                         onClick = { onSelect(minutes) },
                         modifier = Modifier.weight(1f)

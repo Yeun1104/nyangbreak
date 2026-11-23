@@ -170,12 +170,12 @@ fun NavGraph() {
 
                 SettingsScreen(
                     usageLimit = settings.defaultLimitMinutes,
-                    restMinutes = settings.breakSeconds / 60,
+                    restSeconds = settings.breakSeconds,
                     emergencyEnabled = settings.tapToDismissEnabled,
                     preAlertEnabled = settings.preAlertEnabled,
                     selectedCat = settings.catIndex,
                     onUsageLimitChange = { minutes -> settingsVm.setDefaultLimitMinutes(minutes) },
-                    onRestChange = { minutes -> settingsVm.setBreakSeconds(minutes * 60) },
+                    onRestChange = { seconds -> settingsVm.setBreakSeconds(seconds) },
                     onEmergencyToggle = { settingsVm.setTapToDismissEnabled(!settings.tapToDismissEnabled) },
                     onPreAlertToggle = { settingsVm.setPreAlertEnabled(!settings.preAlertEnabled) },
                     onCatSelect = { settingsVm.setCatIndex(it) },
