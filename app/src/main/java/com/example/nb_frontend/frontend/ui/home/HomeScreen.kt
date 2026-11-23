@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -43,6 +44,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
@@ -73,6 +75,7 @@ fun HomeScreen(
     todayHours: Int = 4,
     todayMinutes: Int = 20,
     catCount: Int = 4,
+    appName: String? = null,
     isPaused: Boolean = false,
     onPauseClick: () -> Unit = {}
 ) {
@@ -139,7 +142,8 @@ fun HomeScreen(
                     limitMinutes = limitMinutes,
                     todayHours = todayHours,
                     todayMinutes = todayMinutes,
-                    catCount = catCount
+                    catCount = catCount,
+                    appName = appName
                 )
             }
         }
@@ -223,7 +227,8 @@ private fun UsageCard(
     limitMinutes: Int,
     todayHours: Int,
     todayMinutes: Int,
-    catCount: Int
+    catCount: Int,
+    appName: String?
 ) {
     Column(
         modifier = Modifier
@@ -234,7 +239,7 @@ private fun UsageCard(
             .padding(top = 40.dp, bottom = 20.dp, start = 16.dp, end = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        UsageRing(current = continuousMinutes, limit = limitMinutes)
+        UsageRing(current = continuousMinutes, limit = limitMinutes, appName = appName)
         Spacer(modifier = Modifier.weight(1f))
         HorizontalDivider(thickness = 1.dp, color = NbBrown10)
         Spacer(modifier = Modifier.height(16.dp))
@@ -260,7 +265,7 @@ private fun UsageCard(
 }
 
 @Composable
-private fun UsageRing(current: Int, limit: Int) {
+private fun UsageRing(current: Int, limit: Int, appName: String?) {
     val ringSize = 240.dp
     val strokeWidth = 32.dp
 
@@ -302,6 +307,18 @@ private fun UsageRing(current: Int, limit: Int) {
         }
 
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            if (appName != null) {
+                Text(
+                    text = appName,
+                    fontSize = 16.sp,
+                    fontFamily = Jua,
+                    color = NbOrange70,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.widthIn(max = 140.dp)
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+            }
             Text(
                 text = "연속사용",
                 fontSize = 12.sp,

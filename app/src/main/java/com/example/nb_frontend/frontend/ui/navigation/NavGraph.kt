@@ -26,6 +26,7 @@ import com.example.nb_frontend.backend.viewmodel.HistoryViewModel
 import com.example.nb_frontend.backend.viewmodel.HomeViewModel
 import com.example.nb_frontend.backend.viewmodel.PermissionViewModel
 import com.example.nb_frontend.backend.viewmodel.SettingsViewModel
+import com.example.nb_frontend.backend.viewmodel.TrackedAppStatus
 import com.example.nb_frontend.backend.viewmodel.TrackedAppsViewModel
 import com.example.nb_frontend.frontend.ui.components.NbTab
 import com.example.nb_frontend.frontend.ui.components.TabBar
@@ -126,7 +127,9 @@ fun NavGraph() {
                 val vm: HomeViewModel = viewModel()
                 val state by vm.uiState.collectAsStateWithLifecycle()
 
-                val focus = state.apps.minByOrNull { it.remainingMinutes }
+                val focus = state.apps.minWithOrNull(
+                    compareBy<TrackedAppStatus>({ it.remainingMinutes }, { -it.usedMinutes })
+                )
 
                 val live by MonitorStatus.live.collectAsStateWithLifecycle()
 
@@ -137,6 +140,7 @@ fun NavGraph() {
                         todayHours = state.todayHours,
                         todayMinutes = state.todayMinutes,
                         catCount = state.catCount,
+                        appName = focus?.takeIf { it.usedMinutes > 0 }?.name,
                         isPaused = state.isPaused,
                         onPauseClick = { vm.togglePause() }
                     )
