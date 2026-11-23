@@ -1,4 +1,4 @@
-package com.example.nb_frontend.ui.components
+package com.example.nb_frontend.frontend.ui.components
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
@@ -24,10 +24,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.nb_frontend.R
-import com.example.nb_frontend.ui.theme.NbBrown10
-import com.example.nb_frontend.ui.theme.NbBrown60
-import com.example.nb_frontend.ui.theme.NbOrange50
-import com.example.nb_frontend.ui.theme.NbWhite
+import com.example.nb_frontend.frontend.ui.theme.NbBrown10
+import com.example.nb_frontend.frontend.ui.theme.NbBrown60
+import com.example.nb_frontend.frontend.ui.theme.NbOrange50
+import com.example.nb_frontend.frontend.ui.theme.NbWhite
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.padding
 
@@ -44,15 +44,15 @@ enum class NbTab(
 @Composable
 fun TabBar(
     currentRoute: String?,
-    onTabClick: (NbTab) -> Unit
+    onTabClick: (com.example.nb_frontend.frontend.ui.components.NbTab) -> Unit
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(NbWhite)
+            .background(_root_ide_package_.com.example.nb_frontend.frontend.ui.theme.NbWhite)
             .navigationBarsPadding()
     ) {
-        HorizontalDivider(thickness = 1.dp, color = NbBrown10)
+        HorizontalDivider(thickness = 1.dp, color = _root_ide_package_.com.example.nb_frontend.frontend.ui.theme.NbBrown10)
 
         Row(
             modifier = Modifier
@@ -61,8 +61,8 @@ fun TabBar(
                 .padding(horizontal = 20.dp)
                 .padding(top = 12.dp)
         ) {
-            NbTab.entries.forEach { tab ->
-                TabBarItem(
+            _root_ide_package_.com.example.nb_frontend.frontend.ui.components.NbTab.entries.forEach { tab ->
+                _root_ide_package_.com.example.nb_frontend.frontend.ui.components.TabBarItem(
                     tab = tab,
                     selected = currentRoute == tab.route,
                     onClick = { onTabClick(tab) },
@@ -75,12 +75,12 @@ fun TabBar(
 
 @Composable
 private fun TabBarItem(
-    tab: NbTab,
+    tab: com.example.nb_frontend.frontend.ui.components.NbTab,
     selected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val color = if (selected) NbOrange50 else NbBrown60
+    val color = if (selected) _root_ide_package_.com.example.nb_frontend.frontend.ui.theme.NbOrange50 else _root_ide_package_.com.example.nb_frontend.frontend.ui.theme.NbBrown60
 
     Column(
         modifier = modifier
@@ -111,5 +111,7 @@ private fun TabBarItem(
 @Preview(showBackground = true)
 @Composable
 private fun TabBarPreview() {
-    TabBar(currentRoute = "home", onTabClick = {})
+    _root_ide_package_.com.example.nb_frontend.frontend.ui.components.TabBar(
+        currentRoute = "home",
+        onTabClick = {})
 }

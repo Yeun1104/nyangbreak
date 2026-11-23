@@ -1,4 +1,4 @@
-package com.example.nb_frontend.ui.settings
+package com.example.nb_frontend.frontend.ui.settings
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
@@ -44,37 +44,41 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.nb_frontend.R
-import com.example.nb_frontend.ui.components.TabBar
-import com.example.nb_frontend.ui.theme.Jua
-import com.example.nb_frontend.ui.theme.NbBrown10
-import com.example.nb_frontend.ui.theme.NbBrown20
-import com.example.nb_frontend.ui.theme.NbBrown5
-import com.example.nb_frontend.ui.theme.NbBrown60
-import com.example.nb_frontend.ui.theme.NbBrown90
-import com.example.nb_frontend.ui.theme.NbOrange10
-import com.example.nb_frontend.ui.theme.NbOrange20
-import com.example.nb_frontend.ui.theme.NbOrange40
-import com.example.nb_frontend.ui.theme.NbWhite
-import com.example.nb_frontend.ui.theme.Roboto
+import com.example.nb_frontend.frontend.ui.components.TabBar
+import com.example.nb_frontend.frontend.ui.theme.Jua
+import com.example.nb_frontend.frontend.ui.theme.NbBrown10
+import com.example.nb_frontend.frontend.ui.theme.NbBrown20
+import com.example.nb_frontend.frontend.ui.theme.NbBrown5
+import com.example.nb_frontend.frontend.ui.theme.NbBrown60
+import com.example.nb_frontend.frontend.ui.theme.NbBrown90
+import com.example.nb_frontend.frontend.ui.theme.NbOrange10
+import com.example.nb_frontend.frontend.ui.theme.NbOrange20
+import com.example.nb_frontend.frontend.ui.theme.NbOrange40
+import com.example.nb_frontend.frontend.ui.theme.NbWhite
+import com.example.nb_frontend.frontend.ui.theme.Roboto
 
-private val usageOptions = listOf(15, 30, 45, 60, 75, 90)
+private val usageOptions = listOf(1, 6, 15, 30, 45, 60, 75, 90)
 private val restOptions = listOf(1, 3, 5)
 private val catImages = listOf(
     R.drawable.cat_tabby,
-    R.drawable.cat_gray_white,
+    R.drawable.cat_orange,
     R.drawable.cat_tuxedo
 )
 
 @Composable
 fun SettingsScreen(
+    usageLimit: Int = 60,
+    restMinutes: Int = 3,
+    emergencyEnabled: Boolean = true,
+    preAlertEnabled: Boolean = true,
+    selectedCat: Int = 0,
+    onUsageLimitChange: (Int) -> Unit = {},
+    onRestChange: (Int) -> Unit = {},
+    onEmergencyToggle: () -> Unit = {},
+    onPreAlertToggle: () -> Unit = {},
+    onCatSelect: (Int) -> Unit = {},
     onTrackedAppsClick: () -> Unit = {}
 ) {
-    var usageLimit by remember { mutableIntStateOf(60) }
-    var restTime by remember { mutableIntStateOf(3) }
-    var emergencyEnabled by remember { mutableStateOf(true) }
-    var preAlertEnabled by remember { mutableStateOf(true) }
-    var selectedCat by remember { mutableIntStateOf(0) }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -100,7 +104,7 @@ fun SettingsScreen(
             OptionChips(
                 options = usageOptions,
                 selected = usageLimit,
-                onSelect = { usageLimit = it }
+                onSelect = onUsageLimitChange
             )
         }
 
@@ -111,8 +115,8 @@ fun SettingsScreen(
             Spacer(modifier = Modifier.height(16.dp))
             OptionChips(
                 options = restOptions,
-                selected = restTime,
-                onSelect = { restTime = it }
+                selected = restMinutes,
+                onSelect = onRestChange
             )
         }
 
@@ -148,13 +152,13 @@ fun SettingsScreen(
             CheckRow(
                 label = "긴급 해체 버튼 사용",
                 checked = emergencyEnabled,
-                onToggle = { emergencyEnabled = !emergencyEnabled }
+                onToggle = onEmergencyToggle
             )
             HorizontalDivider(thickness = 1.dp, color = NbBrown10)
             CheckRow(
                 label = "고양이 등장 5분 전 알림",
                 checked = preAlertEnabled,
-                onToggle = { preAlertEnabled = !preAlertEnabled }
+                onToggle = onPreAlertToggle
             )
         }
 
@@ -171,7 +175,7 @@ fun SettingsScreen(
                     CatOption(
                         imageRes = imageRes,
                         selected = selectedCat == index,
-                        onClick = { selectedCat = index },
+                        onClick = { onCatSelect(index) },
                         modifier = Modifier.weight(1f)
                     )
                 }

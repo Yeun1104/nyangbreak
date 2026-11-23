@@ -1,4 +1,4 @@
-package com.example.nb_frontend.ui.permission
+package com.example.nb_frontend.frontend.ui.permission
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -39,23 +39,26 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.nb_frontend.R
-import com.example.nb_frontend.ui.theme.Jua
-import com.example.nb_frontend.ui.theme.NbBrown20
-import com.example.nb_frontend.ui.theme.NbBrown5
-import com.example.nb_frontend.ui.theme.NbBrown60
-import com.example.nb_frontend.ui.theme.NbBrown80
-import com.example.nb_frontend.ui.theme.NbBrown90
-import com.example.nb_frontend.ui.theme.NbOrange10
-import com.example.nb_frontend.ui.theme.NbOrange50
-import com.example.nb_frontend.ui.theme.NbWhite
-import com.example.nb_frontend.ui.theme.Roboto
-
+import com.example.nb_frontend.frontend.ui.theme.Jua
+import com.example.nb_frontend.frontend.ui.theme.NbBrown20
+import com.example.nb_frontend.frontend.ui.theme.NbBrown5
+import com.example.nb_frontend.frontend.ui.theme.NbBrown60
+import com.example.nb_frontend.frontend.ui.theme.NbBrown80
+import com.example.nb_frontend.frontend.ui.theme.NbBrown90
+import com.example.nb_frontend.frontend.ui.theme.NbOrange10
+import com.example.nb_frontend.frontend.ui.theme.NbOrange50
+import com.example.nb_frontend.frontend.ui.theme.NbWhite
+import com.example.nb_frontend.frontend.ui.theme.Roboto
 @Composable
-fun PermissionScreen(onStart: () -> Unit) {
-    var usageGranted by remember { mutableStateOf(false) }
-    var overlayGranted by remember { mutableStateOf(false) }
-    var notificationGranted by remember { mutableStateOf(false) }
-
+fun PermissionScreen(
+    usageGranted: Boolean = false,
+    overlayGranted: Boolean = false,
+    notificationGranted: Boolean = false,
+    onUsageClick: () -> Unit = {},
+    onOverlayClick: () -> Unit = {},
+    onNotificationClick: () -> Unit = {},
+    onStart: () -> Unit
+) {
     val allGranted = usageGranted && overlayGranted && notificationGranted
 
     Column(
@@ -100,7 +103,7 @@ fun PermissionScreen(onStart: () -> Unit) {
             title = "사용 정보 접근",
             description = "어떤 앱을 얼마나 썼는지 측정해요",
             granted = usageGranted,
-            onClick = { usageGranted = !usageGranted }
+            onClick = onUsageClick
         )
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -109,7 +112,7 @@ fun PermissionScreen(onStart: () -> Unit) {
             title = "다른 앱 위에 표시",
             description = "제한 시간이 되면 고양이가 화면을 덮어요",
             granted = overlayGranted,
-            onClick = { overlayGranted = !overlayGranted }
+            onClick = onOverlayClick
         )
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -118,7 +121,7 @@ fun PermissionScreen(onStart: () -> Unit) {
             title = "알림",
             description = "고양이 등장 5분 전에 미리 알려줘요",
             granted = notificationGranted,
-            onClick = { notificationGranted = !notificationGranted }
+            onClick = onNotificationClick
         )
 
         Spacer(modifier = Modifier.weight(1f))

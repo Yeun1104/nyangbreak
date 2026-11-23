@@ -1,4 +1,4 @@
-package com.example.nb_frontend.ui.home
+package com.example.nb_frontend.frontend.ui.home
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
@@ -31,10 +31,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -53,20 +49,20 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.nb_frontend.R
-import com.example.nb_frontend.ui.components.TabBar
-import com.example.nb_frontend.ui.theme.Jua
-import com.example.nb_frontend.ui.theme.NbBrown10
-import com.example.nb_frontend.ui.theme.NbBrown20
-import com.example.nb_frontend.ui.theme.NbBrown5
-import com.example.nb_frontend.ui.theme.NbBrown60
-import com.example.nb_frontend.ui.theme.NbBrown80
-import com.example.nb_frontend.ui.theme.NbBrown90
-import com.example.nb_frontend.ui.theme.NbOrange10
-import com.example.nb_frontend.ui.theme.NbOrange20
-import com.example.nb_frontend.ui.theme.NbOrange40
-import com.example.nb_frontend.ui.theme.NbOrange50
-import com.example.nb_frontend.ui.theme.NbOrange70
-import com.example.nb_frontend.ui.theme.NbWhite
+import com.example.nb_frontend.frontend.ui.components.TabBar
+import com.example.nb_frontend.frontend.ui.theme.Jua
+import com.example.nb_frontend.frontend.ui.theme.NbBrown10
+import com.example.nb_frontend.frontend.ui.theme.NbBrown20
+import com.example.nb_frontend.frontend.ui.theme.NbBrown5
+import com.example.nb_frontend.frontend.ui.theme.NbBrown60
+import com.example.nb_frontend.frontend.ui.theme.NbBrown80
+import com.example.nb_frontend.frontend.ui.theme.NbBrown90
+import com.example.nb_frontend.frontend.ui.theme.NbOrange10
+import com.example.nb_frontend.frontend.ui.theme.NbOrange20
+import com.example.nb_frontend.frontend.ui.theme.NbOrange40
+import com.example.nb_frontend.frontend.ui.theme.NbOrange50
+import com.example.nb_frontend.frontend.ui.theme.NbOrange70
+import com.example.nb_frontend.frontend.ui.theme.NbWhite
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -76,11 +72,11 @@ fun HomeScreen(
     limitMinutes: Int = 60,
     todayHours: Int = 4,
     todayMinutes: Int = 20,
-    catCount: Int = 4
+    catCount: Int = 4,
+    isPaused: Boolean = false,
+    onPauseClick: () -> Unit = {}
 ) {
-    var isPaused by remember { mutableStateOf(false) }
     val remainMinutes = (limitMinutes - continuousMinutes).coerceAtLeast(0)
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -132,7 +128,7 @@ fun HomeScreen(
                     Spacer(modifier = Modifier.height(12.dp))
                     PauseButton(
                         isPaused = isPaused,
-                        onClick = { isPaused = !isPaused }
+                        onClick = onPauseClick
                     )
                 }
 
@@ -312,6 +308,7 @@ private fun UsageRing(current: Int, limit: Int) {
                 fontFamily = Jua,
                 color = NbBrown60
             )
+            Spacer(modifier = Modifier.height(8.dp))
             Row {
                 Text(
                     text = "$current",

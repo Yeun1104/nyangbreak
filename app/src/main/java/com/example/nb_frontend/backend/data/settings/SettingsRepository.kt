@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
 
 enum class CatCharacter(@DrawableRes val imageRes: Int) {
     TABBY(R.drawable.cat_tabby),
-    GRAY_WHITE(R.drawable.cat_gray_white),
+    GRAY_WHITE(R.drawable.cat_orange),
     TUXEDO(R.drawable.cat_tuxedo);
 
     companion object {

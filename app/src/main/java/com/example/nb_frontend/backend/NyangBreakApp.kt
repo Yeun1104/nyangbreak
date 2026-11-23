@@ -7,10 +7,15 @@ import android.app.NotificationManager
 import android.os.Bundle
 import com.example.nb_frontend.backend.service.MonitorController
 import com.example.nb_frontend.backend.work.WorkScheduler
+import com.example.nb_frontend.backend.block.BreakScreenRegistry
+import com.example.nb_frontend.frontend.ui.overlay.BreakScreen
 
 class NyangBreakApp : Application() {
     override fun onCreate() {
         super.onCreate()
+        BreakScreenRegistry.register { state, release ->
+            BreakScreen(state = state, onRelease = release)
+        }
         createNotificationChannels()
         WorkScheduler.scheduleAll(this)
         registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacks {
