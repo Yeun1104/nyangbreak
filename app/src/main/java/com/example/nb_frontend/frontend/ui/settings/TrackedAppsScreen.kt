@@ -1,7 +1,9 @@
-package com.example.nb_frontend.ui.settings
+package com.example.nb_frontend.frontend.ui.settings
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -19,43 +21,54 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.nb_frontend.ui.theme.Jua
-import com.example.nb_frontend.ui.theme.NbBrown10
-import com.example.nb_frontend.ui.theme.NbBrown20
-import com.example.nb_frontend.ui.theme.NbBrown5
-import com.example.nb_frontend.ui.theme.NbBrown60
-import com.example.nb_frontend.ui.theme.NbBrown90
-import com.example.nb_frontend.ui.theme.NbOrange10
-import com.example.nb_frontend.ui.theme.NbOrange40
-import com.example.nb_frontend.ui.theme.NbWhite
-import com.example.nb_frontend.ui.theme.Roboto
+import com.example.nb_frontend.frontend.ui.theme.Jua
+import com.example.nb_frontend.frontend.ui.theme.NbBrown10
+import com.example.nb_frontend.frontend.ui.theme.NbBrown20
+import com.example.nb_frontend.frontend.ui.theme.NbBrown5
+import com.example.nb_frontend.frontend.ui.theme.NbBrown60
+import com.example.nb_frontend.frontend.ui.theme.NbBrown90
+import com.example.nb_frontend.frontend.ui.theme.NbOrange10
+import com.example.nb_frontend.frontend.ui.theme.NbOrange40
+import com.example.nb_frontend.frontend.ui.theme.NbWhite
+import com.example.nb_frontend.frontend.ui.theme.Roboto
 
 data class TrackedAppItem(
     val packageName: String,
     val name: String
 )
 
+private val limitOptions = listOf(15, 30, 45, 60, 75, 90)
+
 @Composable
 fun TrackedAppsScreen(
     apps: List<TrackedAppItem>,
     trackedPackages: Set<String>,
+    limitMinutes: Map<String, Int> = emptyMap(),
     onToggle: (packageName: String, enabled: Boolean) -> Unit,
     onToggleAll: (enabled: Boolean) -> Unit,
+    onLimitChange: (packageName: String, minutes: Int) -> Unit = { _, _ -> },
     onBack: () -> Unit
 ) {
     val allOn = apps.isNotEmpty() && apps.all { it.packageName in trackedPackages }
+    var editingApp by remember { mutableStateOf<TrackedAppItem?>(null) }
 
     Column(
         modifier = Modifier
@@ -87,7 +100,7 @@ fun TrackedAppsScreen(
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "추적을 허용할 앱을 선택하여 주세요",
+            text = "추적할 앱을 켜고, 시간을 눌러 앱마다 연속사용 시간을 정해 주세요",
             fontFamily = Roboto,
             fontSize = 13.sp,
             color = NbBrown60
@@ -128,7 +141,9 @@ fun TrackedAppsScreen(
                 AppToggleRow(
                     app = app,
                     checked = app.packageName in trackedPackages,
-                    onCheckedChange = { onToggle(app.packageName, it) }
+                    limitMinutes = limitMinutes[app.packageName],
+                    onCheckedChange = { onToggle(app.packageName, it) },
+                    onLimitClick = { editingApp = app }
                 )
                 if (index < apps.lastIndex) {
                     HorizontalDivider(thickness = 1.dp, color = NbBrown10)
@@ -138,13 +153,27 @@ fun TrackedAppsScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
     }
+
+    editingApp?.let { app ->
+        LimitPickerDialog(
+            appName = app.name,
+            selected = limitMinutes[app.packageName],
+            onSelect = { minutes ->
+                onLimitChange(app.packageName, minutes)
+                editingApp = null
+            },
+            onDismiss = { editingApp = null }
+        )
+    }
 }
 
 @Composable
 private fun AppToggleRow(
     app: TrackedAppItem,
     checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit
+    limitMinutes: Int?,
+    onCheckedChange: (Boolean) -> Unit,
+    onLimitClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -178,8 +207,90 @@ private fun AppToggleRow(
             modifier = Modifier.weight(1f)
         )
 
+        if (checked && limitMinutes != null) {
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(NbOrange10)
+                    .clickable(onClick = onLimitClick)
+                    .padding(horizontal = 10.dp, vertical = 6.dp)
+            ) {
+                Text(
+                    text = "${limitMinutes}분",
+                    fontFamily = Jua,
+                    fontSize = 13.sp,
+                    color = NbBrown90
+                )
+            }
+            Spacer(modifier = Modifier.width(8.dp))
+        }
+
         NbSwitch(checked = checked, onCheckedChange = onCheckedChange)
     }
+}
+
+@Composable
+private fun LimitPickerDialog(
+    appName: String,
+    selected: Int?,
+    onSelect: (Int) -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = NbWhite,
+        title = {
+            Text(
+                text = appName,
+                fontFamily = Jua,
+                fontSize = 20.sp,
+                color = NbBrown90
+            )
+        },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(
+                    text = "연속사용 시간을 골라 주세요",
+                    fontFamily = Roboto,
+                    fontSize = 13.sp,
+                    color = NbBrown60
+                )
+                limitOptions.chunked(3).forEach { rowOptions ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        rowOptions.forEach { minutes ->
+                            val isSelected = minutes == selected
+                            val shape = RoundedCornerShape(10.dp)
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(40.dp)
+                                    .clip(shape)
+                                    .background(if (isSelected) NbBrown60 else NbWhite)
+                                    .border(1.dp, if (isSelected) NbBrown60 else NbBrown20, shape)
+                                    .clickable { onSelect(minutes) },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "${minutes}분",
+                                    fontFamily = Jua,
+                                    fontSize = 14.sp,
+                                    color = if (isSelected) NbWhite else NbBrown60
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text(text = "닫기", fontFamily = Jua, color = NbBrown60)
+            }
+        }
+    )
 }
 
 @Composable

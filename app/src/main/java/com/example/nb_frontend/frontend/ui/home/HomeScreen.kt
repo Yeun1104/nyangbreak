@@ -1,4 +1,4 @@
-package com.example.nb_frontend.ui.home
+package com.example.nb_frontend.frontend.ui.home
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -31,10 +32,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,26 +44,27 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.nb_frontend.R
-import com.example.nb_frontend.ui.components.TabBar
-import com.example.nb_frontend.ui.theme.Jua
-import com.example.nb_frontend.ui.theme.NbBrown10
-import com.example.nb_frontend.ui.theme.NbBrown20
-import com.example.nb_frontend.ui.theme.NbBrown5
-import com.example.nb_frontend.ui.theme.NbBrown60
-import com.example.nb_frontend.ui.theme.NbBrown80
-import com.example.nb_frontend.ui.theme.NbBrown90
-import com.example.nb_frontend.ui.theme.NbOrange10
-import com.example.nb_frontend.ui.theme.NbOrange20
-import com.example.nb_frontend.ui.theme.NbOrange40
-import com.example.nb_frontend.ui.theme.NbOrange50
-import com.example.nb_frontend.ui.theme.NbOrange70
-import com.example.nb_frontend.ui.theme.NbWhite
+import com.example.nb_frontend.frontend.ui.components.TabBar
+import com.example.nb_frontend.frontend.ui.theme.Jua
+import com.example.nb_frontend.frontend.ui.theme.NbBrown10
+import com.example.nb_frontend.frontend.ui.theme.NbBrown20
+import com.example.nb_frontend.frontend.ui.theme.NbBrown5
+import com.example.nb_frontend.frontend.ui.theme.NbBrown60
+import com.example.nb_frontend.frontend.ui.theme.NbBrown80
+import com.example.nb_frontend.frontend.ui.theme.NbBrown90
+import com.example.nb_frontend.frontend.ui.theme.NbOrange10
+import com.example.nb_frontend.frontend.ui.theme.NbOrange20
+import com.example.nb_frontend.frontend.ui.theme.NbOrange40
+import com.example.nb_frontend.frontend.ui.theme.NbOrange50
+import com.example.nb_frontend.frontend.ui.theme.NbOrange70
+import com.example.nb_frontend.frontend.ui.theme.NbWhite
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -76,11 +74,12 @@ fun HomeScreen(
     limitMinutes: Int = 60,
     todayHours: Int = 4,
     todayMinutes: Int = 20,
-    catCount: Int = 4
+    catCount: Int = 4,
+    appName: String? = null,
+    isPaused: Boolean = false,
+    onPauseClick: () -> Unit = {}
 ) {
-    var isPaused by remember { mutableStateOf(false) }
     val remainMinutes = (limitMinutes - continuousMinutes).coerceAtLeast(0)
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -132,7 +131,7 @@ fun HomeScreen(
                     Spacer(modifier = Modifier.height(12.dp))
                     PauseButton(
                         isPaused = isPaused,
-                        onClick = { isPaused = !isPaused }
+                        onClick = onPauseClick
                     )
                 }
 
@@ -143,7 +142,8 @@ fun HomeScreen(
                     limitMinutes = limitMinutes,
                     todayHours = todayHours,
                     todayMinutes = todayMinutes,
-                    catCount = catCount
+                    catCount = catCount,
+                    appName = appName
                 )
             }
         }
@@ -207,7 +207,7 @@ private fun PauseButton(isPaused: Boolean, onClick: () -> Unit) {
     ) {
         Icon(
             painter = painterResource(
-                id = if (isPaused) R.drawable.ic_pause else R.drawable.ic_pause
+                id = if (isPaused) R.drawable.ic_play else R.drawable.ic_pause
             ),
             contentDescription = null,
             modifier = Modifier.size(14.dp)
@@ -227,7 +227,8 @@ private fun UsageCard(
     limitMinutes: Int,
     todayHours: Int,
     todayMinutes: Int,
-    catCount: Int
+    catCount: Int,
+    appName: String?
 ) {
     Column(
         modifier = Modifier
@@ -238,7 +239,7 @@ private fun UsageCard(
             .padding(top = 40.dp, bottom = 20.dp, start = 16.dp, end = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        UsageRing(current = continuousMinutes, limit = limitMinutes)
+        UsageRing(current = continuousMinutes, limit = limitMinutes, appName = appName)
         Spacer(modifier = Modifier.weight(1f))
         HorizontalDivider(thickness = 1.dp, color = NbBrown10)
         Spacer(modifier = Modifier.height(16.dp))
@@ -264,7 +265,7 @@ private fun UsageCard(
 }
 
 @Composable
-private fun UsageRing(current: Int, limit: Int) {
+private fun UsageRing(current: Int, limit: Int, appName: String?) {
     val ringSize = 240.dp
     val strokeWidth = 32.dp
 
@@ -306,12 +307,25 @@ private fun UsageRing(current: Int, limit: Int) {
         }
 
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            if (appName != null) {
+                Text(
+                    text = appName,
+                    fontSize = 16.sp,
+                    fontFamily = Jua,
+                    color = NbOrange70,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.widthIn(max = 140.dp)
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+            }
             Text(
                 text = "연속사용",
                 fontSize = 12.sp,
                 fontFamily = Jua,
                 color = NbBrown60
             )
+            Spacer(modifier = Modifier.height(8.dp))
             Row {
                 Text(
                     text = "$current",

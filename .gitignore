@@ -39,3 +39,7 @@ google-services.json
 
 # Android Profiling
 *.hprof
+
+/.idea/deviceManager.xml
+/.idea/vcs.xml
+/.idea/inspectionProfiles

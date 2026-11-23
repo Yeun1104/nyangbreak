@@ -1,4 +1,4 @@
-package com.example.nb_frontend.ui.history
+package com.example.nb_frontend.frontend.ui.history
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -29,16 +29,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.nb_frontend.ui.components.TabBar
-import com.example.nb_frontend.ui.theme.Jua
-import com.example.nb_frontend.ui.theme.NbBrown10
-import com.example.nb_frontend.ui.theme.NbBrown5
-import com.example.nb_frontend.ui.theme.NbBrown60
-import com.example.nb_frontend.ui.theme.NbBrown90
-import com.example.nb_frontend.ui.theme.NbOrange10
-import com.example.nb_frontend.ui.theme.NbOrange40
-import com.example.nb_frontend.ui.theme.NbWhite
-import com.example.nb_frontend.ui.theme.Roboto
+import com.example.nb_frontend.frontend.ui.components.TabBar
+import com.example.nb_frontend.frontend.ui.theme.Jua
+import com.example.nb_frontend.frontend.ui.theme.NbBrown10
+import com.example.nb_frontend.frontend.ui.theme.NbBrown5
+import com.example.nb_frontend.frontend.ui.theme.NbBrown60
+import com.example.nb_frontend.frontend.ui.theme.NbBrown90
+import com.example.nb_frontend.frontend.ui.theme.NbOrange10
+import com.example.nb_frontend.frontend.ui.theme.NbOrange40
+import com.example.nb_frontend.frontend.ui.theme.NbWhite
+import com.example.nb_frontend.frontend.ui.theme.Roboto
 
 data class DayUsage(
     val day: String,
@@ -52,26 +52,30 @@ data class AppUsage(
 )
 
 private val dummyWeekly = listOf(
-    DayUsage("금", 4.0f),
-    DayUsage("토", 6.0f),
-    DayUsage("일", 4.5f),
-    DayUsage("월", 2.0f),
-    DayUsage("화", 6.5f),
-    DayUsage("수", 4.0f),
-    DayUsage("목", 5.0f, isToday = true)
+    _root_ide_package_.com.example.nb_frontend.frontend.ui.history.DayUsage("금", 4.0f),
+    _root_ide_package_.com.example.nb_frontend.frontend.ui.history.DayUsage("토", 6.0f),
+    _root_ide_package_.com.example.nb_frontend.frontend.ui.history.DayUsage("일", 4.5f),
+    _root_ide_package_.com.example.nb_frontend.frontend.ui.history.DayUsage("월", 2.0f),
+    _root_ide_package_.com.example.nb_frontend.frontend.ui.history.DayUsage("화", 6.5f),
+    _root_ide_package_.com.example.nb_frontend.frontend.ui.history.DayUsage("수", 4.0f),
+    _root_ide_package_.com.example.nb_frontend.frontend.ui.history.DayUsage(
+        "목",
+        5.0f,
+        isToday = true
+    )
 )
 
 private val dummyApps = listOf(
-    AppUsage("인스타그램", 125),
-    AppUsage("유튜브", 90),
-    AppUsage("카카오톡", 42)
+    _root_ide_package_.com.example.nb_frontend.frontend.ui.history.AppUsage("인스타그램", 125),
+    _root_ide_package_.com.example.nb_frontend.frontend.ui.history.AppUsage("유튜브", 90),
+    _root_ide_package_.com.example.nb_frontend.frontend.ui.history.AppUsage("카카오톡", 42)
 )
 
 @Composable
 fun HistoryScreen(
     todayMinutes: Int = 277,
     blockCount: Int = 4,
-    weekly: List<DayUsage> = dummyWeekly,
+    weekly: List<com.example.nb_frontend.frontend.ui.history.DayUsage> = dummyWeekly,
     apps: List<AppUsage> = dummyApps
 ) {
     Column(

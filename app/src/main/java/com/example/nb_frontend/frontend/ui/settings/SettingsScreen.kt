@@ -1,4 +1,4 @@
-package com.example.nb_frontend.ui.settings
+package com.example.nb_frontend.frontend.ui.settings
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
@@ -44,37 +44,42 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.nb_frontend.R
-import com.example.nb_frontend.ui.components.TabBar
-import com.example.nb_frontend.ui.theme.Jua
-import com.example.nb_frontend.ui.theme.NbBrown10
-import com.example.nb_frontend.ui.theme.NbBrown20
-import com.example.nb_frontend.ui.theme.NbBrown5
-import com.example.nb_frontend.ui.theme.NbBrown60
-import com.example.nb_frontend.ui.theme.NbBrown90
-import com.example.nb_frontend.ui.theme.NbOrange10
-import com.example.nb_frontend.ui.theme.NbOrange20
-import com.example.nb_frontend.ui.theme.NbOrange40
-import com.example.nb_frontend.ui.theme.NbWhite
-import com.example.nb_frontend.ui.theme.Roboto
+import com.example.nb_frontend.frontend.ui.components.TabBar
+import com.example.nb_frontend.frontend.ui.theme.Jua
+import com.example.nb_frontend.frontend.ui.theme.NbBrown10
+import com.example.nb_frontend.frontend.ui.theme.NbBrown20
+import com.example.nb_frontend.frontend.ui.theme.NbBrown5
+import com.example.nb_frontend.frontend.ui.theme.NbBrown60
+import com.example.nb_frontend.frontend.ui.theme.NbBrown90
+import com.example.nb_frontend.frontend.ui.theme.NbOrange10
+import com.example.nb_frontend.frontend.ui.theme.NbOrange20
+import com.example.nb_frontend.frontend.ui.theme.NbOrange40
+import com.example.nb_frontend.frontend.ui.theme.NbWhite
+import com.example.nb_frontend.frontend.ui.theme.Roboto
 
-private val usageOptions = listOf(15, 30, 45, 60, 75, 90)
-private val restOptions = listOf(1, 3, 5)
+private val usageOptions = listOf(1, 2, 6, 15, 30, 45, 60, 75, 90)
+private val restOptions = listOf(30, 60, 180)
 private val catImages = listOf(
     R.drawable.cat_tabby,
-    R.drawable.cat_gray_white,
+    R.drawable.cat_orange,
     R.drawable.cat_tuxedo
 )
 
 @Composable
 fun SettingsScreen(
-    onTrackedAppsClick: () -> Unit = {}
+    usageLimit: Int = 60,
+    restSeconds: Int = 30,
+    emergencyEnabled: Boolean = true,
+    preAlertEnabled: Boolean = true,
+    selectedCat: Int = 0,
+    onUsageLimitChange: (Int) -> Unit = {},
+    onRestChange: (Int) -> Unit = {},
+    onEmergencyToggle: () -> Unit = {},
+    onPreAlertToggle: () -> Unit = {},
+    onCatSelect: (Int) -> Unit = {},
+    onTrackedAppsClick: () -> Unit = {},
+    onApplyLimitToAll: () -> Unit = {}
 ) {
-    var usageLimit by remember { mutableIntStateOf(60) }
-    var restTime by remember { mutableIntStateOf(3) }
-    var emergencyEnabled by remember { mutableStateOf(true) }
-    var preAlertEnabled by remember { mutableStateOf(true) }
-    var selectedCat by remember { mutableIntStateOf(0) }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -95,13 +100,37 @@ fun SettingsScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         SettingCard {
-            SectionTitle("연속사용 시간 설정")
+            SectionTitle("기본 연속사용 시간")
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "새로 추적하는 앱에 적용돼요. 앱별 시간은 '추적할 앱'에서 바꿀 수 있어요.",
+                fontFamily = Roboto,
+                fontSize = 12.sp,
+                color = NbBrown60
+            )
             Spacer(modifier = Modifier.height(16.dp))
             OptionChips(
                 options = usageOptions,
                 selected = usageLimit,
-                onSelect = { usageLimit = it }
+                onSelect = onUsageLimitChange
             )
+            Spacer(modifier = Modifier.height(12.dp))
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(40.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .border(1.dp, NbBrown20, RoundedCornerShape(10.dp))
+                    .clickable(onClick = onApplyLimitToAll),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "추적 중인 모든 앱에 ${usageLimit}분 적용",
+                    fontFamily = Jua,
+                    fontSize = 14.sp,
+                    color = NbBrown60
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -111,8 +140,9 @@ fun SettingsScreen(
             Spacer(modifier = Modifier.height(16.dp))
             OptionChips(
                 options = restOptions,
-                selected = restTime,
-                onSelect = { restTime = it }
+                selected = restSeconds,
+                onSelect = onRestChange,
+                label = { seconds -> if (seconds < 60) "${seconds}초" else "${seconds / 60}분" }
             )
         }
 
@@ -148,13 +178,13 @@ fun SettingsScreen(
             CheckRow(
                 label = "긴급 해체 버튼 사용",
                 checked = emergencyEnabled,
-                onToggle = { emergencyEnabled = !emergencyEnabled }
+                onToggle = onEmergencyToggle
             )
             HorizontalDivider(thickness = 1.dp, color = NbBrown10)
             CheckRow(
                 label = "고양이 등장 5분 전 알림",
                 checked = preAlertEnabled,
-                onToggle = { preAlertEnabled = !preAlertEnabled }
+                onToggle = onPreAlertToggle
             )
         }
 
@@ -171,7 +201,7 @@ fun SettingsScreen(
                     CatOption(
                         imageRes = imageRes,
                         selected = selectedCat == index,
-                        onClick = { selectedCat = index },
+                        onClick = { onCatSelect(index) },
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -212,7 +242,8 @@ private fun SectionTitle(text: String) {
 private fun OptionChips(
     options: List<Int>,
     selected: Int,
-    onSelect: (Int) -> Unit
+    onSelect: (Int) -> Unit,
+    label: (Int) -> String = { "${it}분" }
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         options.chunked(3).forEach { rowOptions ->
@@ -222,7 +253,7 @@ private fun OptionChips(
             ) {
                 rowOptions.forEach { minutes ->
                     OptionChip(
-                        text = "${minutes}분",
+                        text = label(minutes),
                         selected = selected == minutes,
                         onClick = { onSelect(minutes) },
                         modifier = Modifier.weight(1f)
