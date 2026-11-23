@@ -57,7 +57,7 @@ import com.example.nb_frontend.frontend.ui.theme.NbOrange40
 import com.example.nb_frontend.frontend.ui.theme.NbWhite
 import com.example.nb_frontend.frontend.ui.theme.Roboto
 
-private val usageOptions = listOf(1, 6, 15, 30, 45, 60, 75, 90)
+private val usageOptions = listOf(15, 30, 45, 60, 75, 90)
 private val restOptions = listOf(1, 3, 5)
 private val catImages = listOf(
     R.drawable.cat_tabby,
@@ -77,7 +77,8 @@ fun SettingsScreen(
     onEmergencyToggle: () -> Unit = {},
     onPreAlertToggle: () -> Unit = {},
     onCatSelect: (Int) -> Unit = {},
-    onTrackedAppsClick: () -> Unit = {}
+    onTrackedAppsClick: () -> Unit = {},
+    onApplyLimitToAll: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -99,13 +100,37 @@ fun SettingsScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         SettingCard {
-            SectionTitle("연속사용 시간 설정")
+            SectionTitle("기본 연속사용 시간")
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "새로 추적하는 앱에 적용돼요. 앱별 시간은 '추적할 앱'에서 바꿀 수 있어요.",
+                fontFamily = Roboto,
+                fontSize = 12.sp,
+                color = NbBrown60
+            )
             Spacer(modifier = Modifier.height(16.dp))
             OptionChips(
                 options = usageOptions,
                 selected = usageLimit,
                 onSelect = onUsageLimitChange
             )
+            Spacer(modifier = Modifier.height(12.dp))
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(40.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .border(1.dp, NbBrown20, RoundedCornerShape(10.dp))
+                    .clickable(onClick = onApplyLimitToAll),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "추적 중인 모든 앱에 ${usageLimit}분 적용",
+                    fontFamily = Jua,
+                    fontSize = 14.sp,
+                    color = NbBrown60
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(16.dp))

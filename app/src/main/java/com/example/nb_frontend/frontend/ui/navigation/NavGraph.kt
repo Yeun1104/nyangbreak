@@ -1,5 +1,6 @@
 package com.example.nb_frontend.frontend.ui.navigation
 
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -165,6 +166,7 @@ fun NavGraph() {
                 val trackedVm: TrackedAppsViewModel = viewModel()
                 val settings by settingsVm.settings.collectAsStateWithLifecycle()
                 val tracked by trackedVm.uiState.collectAsStateWithLifecycle()
+                val context = LocalContext.current
 
                 SettingsScreen(
                     usageLimit = settings.defaultLimitMinutes,
@@ -172,15 +174,21 @@ fun NavGraph() {
                     emergencyEnabled = settings.tapToDismissEnabled,
                     preAlertEnabled = settings.preAlertEnabled,
                     selectedCat = settings.catIndex,
-                    onUsageLimitChange = { minutes ->
-                        settingsVm.setDefaultLimitMinutes(minutes)
-                        tracked.trackedPackages.forEach { trackedVm.setLimitMinutes(it, minutes) }
-                    },
+                    onUsageLimitChange = { minutes -> settingsVm.setDefaultLimitMinutes(minutes) },
                     onRestChange = { minutes -> settingsVm.setBreakSeconds(minutes * 60) },
                     onEmergencyToggle = { settingsVm.setTapToDismissEnabled(!settings.tapToDismissEnabled) },
                     onPreAlertToggle = { settingsVm.setPreAlertEnabled(!settings.preAlertEnabled) },
                     onCatSelect = { settingsVm.setCatIndex(it) },
-                    onTrackedAppsClick = { navController.navigate(Routes.TRACKED_APPS) }
+                    onTrackedAppsClick = { navController.navigate(Routes.TRACKED_APPS) },
+                    onApplyLimitToAll = {
+                        val minutes = settings.defaultLimitMinutes
+                        tracked.trackedPackages.forEach { trackedVm.setLimitMinutes(it, minutes) }
+                        Toast.makeText(
+                            context,
+                            "추적 중인 앱 ${tracked.trackedPackages.size}개를 ${minutes}분으로 바꿨어요",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 )
             }
 
@@ -191,8 +199,10 @@ fun NavGraph() {
                 TrackedAppsScreen(
                     apps = state.apps.map { TrackedAppItem(it.packageName, it.name) },
                     trackedPackages = state.trackedPackages,
+                    limitMinutes = state.limitMinutes,
                     onToggle = { pkg, enabled -> vm.setTracked(pkg, enabled) },
                     onToggleAll = { enabled -> vm.setAllTracked(enabled) },
+                    onLimitChange = { pkg, minutes -> vm.setLimitMinutes(pkg, minutes) },
                     onBack = { navController.popBackStack() }
                 )
             }
