@@ -57,7 +57,7 @@ import com.example.nb_frontend.frontend.ui.theme.NbOrange40
 import com.example.nb_frontend.frontend.ui.theme.NbWhite
 import com.example.nb_frontend.frontend.ui.theme.Roboto
 
-private val usageOptions = listOf(15, 30, 45, 60, 75, 90)
+private val usageOptions = listOf(1, 2, 6, 15, 30, 45, 60, 75, 90)
 private val restOptions = listOf(30, 60, 180)
 private val catImages = listOf(
     R.drawable.cat_tabby,
