@@ -207,7 +207,7 @@ private fun PauseButton(isPaused: Boolean, onClick: () -> Unit) {
     ) {
         Icon(
             painter = painterResource(
-                id = if (isPaused) R.drawable.ic_pause else R.drawable.ic_pause
+                id = if (isPaused) R.drawable.ic_play else R.drawable.ic_pause
             ),
             contentDescription = null,
             modifier = Modifier.size(14.dp)
